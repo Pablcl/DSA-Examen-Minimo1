@@ -1,12 +1,13 @@
 package edu.upc.dsa.models;
 
 public class Prestec {
-    String id;
-    String idLector;
-    String idLlibre;
-    String dataPrestec;
-    String dataFinalDevolucio;
-    String estat; // "En tràmit", "Retornat", etc.
+
+    private String id;
+    private String idLector;
+    private String idLlibre;
+    private String dataPrestec;
+    private String dataFinalDevolucio;
+    private String estat; // Estado (si está en trámite o si no), no es mala la de que sea una variable tipo boolean (estat false/true)
 
     public Prestec() {}
 
@@ -16,7 +17,7 @@ public class Prestec {
         this.idLlibre = idLlibre;
         this.dataPrestec = dataPrestec;
         this.dataFinalDevolucio = dataFinalDevolucio;
-        this.estat = "Nada por el momento"; //per defecte, nada por el momento
+        this.estat = "Nada por el momento"; // Estado por defecto
     }
 
     public String getId() {

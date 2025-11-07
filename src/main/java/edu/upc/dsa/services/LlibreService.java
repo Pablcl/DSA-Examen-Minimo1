@@ -20,7 +20,7 @@ import java.util.List;
 @Path("/biblioteca")
 public class LlibreService {
 
-    private LlibreManager lm;
+    private LlibreManagerImpl lm;
 
     public LlibreService() {
         this.lm = LlibreManagerImpl.getInstance();

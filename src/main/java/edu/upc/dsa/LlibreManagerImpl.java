@@ -2,24 +2,19 @@ package edu.upc.dsa;
 
 import edu.upc.dsa.models.*;
 import org.apache.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-
 public class LlibreManagerImpl implements LlibreManager {
 
     private static LlibreManagerImpl instance;
-
     final static Logger logger = Logger.getLogger(LlibreManagerImpl.class);
 
-
-    private List<Stack<Llibre>> llistamunts; //lista de munts de 10
-    private List<Llibre> catalogats;                    //es como la lista de libros (pero un munt)
+    private List<Stack<Llibre>> llistamunts; // Lista de pilas de libros
+    private List<Llibre> catalogats;
     private List<Lector> lectors;
     private List<Prestec> prestecs;
-
 
     private LlibreManagerImpl() {
         llistamunts = new ArrayList<>();
@@ -34,15 +29,6 @@ public class LlibreManagerImpl implements LlibreManager {
             instance = new LlibreManagerImpl();
         }
         return instance;
-    }
-
-    // Mètode per reiniciar la instància (només per a proves)
-    public void reset() {
-        this.catalogats.clear();
-        this.lectors.clear();
-        this.prestecs.clear();
-        this.llistamunts.clear();
-        this.llistamunts.add(new Stack<>());
     }
 
     @Override
@@ -65,6 +51,7 @@ public class LlibreManagerImpl implements LlibreManager {
         lectors.add(lector);
         logger.info("Nuevo lector añadido: " + lector.getNom() + ". Total lectores: " + lectors.size());
     }
+
     @Override
     public void emmagatzemarLlibre(Llibre llibre){
         logger.info("emmagatzemarLlibre(llibre: " + llibre.getTitol() + ")");
@@ -85,18 +72,18 @@ public class LlibreManagerImpl implements LlibreManager {
         logger.info("catalogarLlibre() - Inicio");
         Stack<Llibre> munt = llistamunts.get(0); //primer munt
 
-        if (munt.isEmpty()) { // Comprobamos antes de intentar pop
+        if (munt.isEmpty()) {
             logger.warn("No hay libros en el primer munt para catalogar. Operación de catalogación omitida.");
             return; // Salida temprana, no se devuelve código de estado
         }
-        Llibre llibre = munt.pop(); // Ahora es seguro hacer pop
+        Llibre llibre = munt.pop();
 
         if (munt.isEmpty()){
             if(llistamunts.size() > 1){
-                llistamunts.remove(0); //se elimina munt actual
+                llistamunts.remove(0);
             }
         }
-        for (Llibre l : catalogats){ // El bucle for debe estar fuera del if (llibre == null)
+        for (Llibre l : catalogats){
             if (l.getISBN().equals(llibre.getISBN())){
                 l.setQuantitat(l.getQuantitat() + 1);
                 logger.info("ISBN '" + llibre.getISBN() + "' ya catalogado. Se ha incrementado el nombre d'exemplars a " + l.getQuantitat());
@@ -135,7 +122,6 @@ public class LlibreManagerImpl implements LlibreManager {
         logger.error("Error en prestarLlibre: Libro con ID '" + prestec.getIdLlibre() + "' no encontrado en el catálogo.");
     }
 
-
     @Override
     public List<Prestec> consultarPrestecs(Lector lector){
         logger.info("consultarPrestecs(lectorID: " + lector.getId() + ") - Inicio");
@@ -150,9 +136,8 @@ public class LlibreManagerImpl implements LlibreManager {
 
     }
 
-    @Override
     public int sizeLectors() {
-        return this.lectors.size();
+        return lectors.size();
     }
 
     public int sizeCatalogats() {
@@ -167,12 +152,10 @@ public class LlibreManagerImpl implements LlibreManager {
         return this.catalogats.stream().filter(l -> l.getId().equals(id)).findFirst().orElse(null);
     }
 
-    @Override
     public Llibre getLlibre(String id) {
         return this.catalogats.stream().filter(l -> l.getId().equals(id)).findFirst().orElse(null);
     }
 
-    @Override
     public Lector getLector(String id) {
         return this.lectors.stream().filter(l -> l.getId().equals(id)).findFirst().orElse(null);
     }

@@ -23,7 +23,7 @@ public class LlibreManagerTest {
 
     @After
     public void tearDown() {
-        this.lm.reset();
+        this.lm = null;
     }
 
 

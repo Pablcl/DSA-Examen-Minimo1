@@ -10,9 +10,9 @@ public class Llibre {
     private int numedicio;
     private String autor;
     private String tematica;
-    private int quantitat; // Nuevo campo para la cantidad de ejemplares
+    private int quantitat;
 
-    public Llibre() {} //constructor vacío
+    public Llibre() {} // Constructor vacío
 
     public Llibre(String id, String ISBN, String titol, String editorial, int any, int numedicio, String autor, String tematica) {
         this.id = id;
@@ -23,7 +23,7 @@ public class Llibre {
         this.numedicio = numedicio;
         this.autor = autor;
         this.tematica = tematica;
-        this.quantitat = 0; // Inicializamos la cantidad a 0 por defecto
+        this.quantitat = 0;
     }
 
     public String getId() {

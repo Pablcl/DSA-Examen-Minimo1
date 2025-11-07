@@ -12,13 +12,4 @@ public interface LlibreManager {
     public void catalogarLlibre();
     public void prestarLlibre(Prestec prestec);
     public List<Prestec> consultarPrestecs(Lector lector);
-
-    public Llibre getLlibre(String id);
-    public Lector getLector(String id);
-    public int sizeLectors();
-    public int sizeCatalogats();
-    public int sizePrestecs();
-    public Llibre getLlibreCatalogat(String id);
-
-
 }

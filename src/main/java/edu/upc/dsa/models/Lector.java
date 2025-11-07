@@ -2,16 +2,15 @@ package edu.upc.dsa.models;
 
 public class Lector {
 
-    String id;
-    String nom;
-    String cognoms;
-    String dni;
-    String datanaixement;
-    String llocnaixement;
-    String adreça;
+    private String id;
+    private String nom;
+    private String cognoms;
+    private String dni;
+    private String datanaixement;
+    private String llocnaixement;
+    private String adreça;
 
-
-    public Lector() {} //constructor vacío
+    public Lector() {} // Constructor vacío
 
     public Lector(String id, String nom, String cognoms, String dni, String datanaixement, String llocnaixement, String adreça) {
         this.id = id;
