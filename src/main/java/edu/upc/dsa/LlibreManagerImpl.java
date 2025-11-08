@@ -3,6 +3,7 @@ package edu.upc.dsa;
 import edu.upc.dsa.models.*;
 import org.apache.log4j.Logger;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -17,7 +18,7 @@ public class LlibreManagerImpl implements LlibreManager {
     private List<Prestec> prestecs;
 
     private LlibreManagerImpl() {
-        llistamunts = new ArrayList<>();
+        llistamunts = new LinkedList<>();
         llistamunts.add(new Stack<>());
         catalogats = new ArrayList<>();
         lectors = new ArrayList<Lector>();
