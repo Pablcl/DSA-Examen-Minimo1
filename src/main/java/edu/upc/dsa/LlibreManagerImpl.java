@@ -175,13 +175,6 @@ public class LlibreManagerImpl implements LlibreManager {
         return prestecs.size();
     }
 
-    public Llibre getLlibreCatalogat(String id) {
-        for (Llibre l : catalogats){
-            if (l.getId().equals(id)) return l;
-        }
-        return null;
-    }
-
     public Llibre getLlibre(String id) {
         for (Llibre l : catalogats){
             if (l.getId().equals(id)) return l;

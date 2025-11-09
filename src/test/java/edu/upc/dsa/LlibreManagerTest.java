@@ -1,4 +1,3 @@
-// java
 package edu.upc.dsa;
 
 import edu.upc.dsa.exceptions.LibroNoEncontradoException;
@@ -23,7 +22,7 @@ public class LlibreManagerTest {
 
     @After
     public void tearDown() throws Exception {
-        lm.reset(); // Reiniciamos el estado del Singleton después de cada test
+        lm.reset();
     }
 
     @Test
@@ -35,55 +34,46 @@ public class LlibreManagerTest {
         Assert.assertNotNull(found);
         Assert.assertEquals("Pablo", found.getNom());
 
-        // Actualizar
         Lector updated = new Lector("lector1", "Pau", "Casado", "63482641G", "12/08/2005", "Barcelona", "C/Viladomat 112");
         lm.afegirLector(updated);
         Assert.assertEquals(1, lm.sizeLectors());
-        Lector found2 = lm.getLector("lector1");
-        Assert.assertEquals("Pau", found2.getNom());
+        Assert.assertEquals("Pau", lm.getLector("lector1").getNom());
     }
 
     @Test
     public void testEmmagatzemarICatalogar() {
         Llibre llibre = new Llibre("llibre1", "isbn-1234", "Titol", "Editorial", 2020, 1, "Autor", "Tematica");
         lm.emmagatzemarLlibre(llibre);
-        lm.catalogarLlibre(); // catalogar primer ejemplar
+        lm.catalogarLlibre();
         Assert.assertEquals(1, lm.sizeCatalogats());
-        Llibre cat = lm.getLlibreByISBN("isbn-1234");
-        Assert.assertNotNull(cat);
-        Assert.assertEquals(1, cat.getQuantitat());
+        Assert.assertEquals(1, lm.getLlibreByISBN("isbn-1234").getQuantitat());
 
-        // almacenar y catalogar otro del mismo ISBN -> incrementa quantitat
         Llibre llibre2 = new Llibre("llibre2", "isbn-1234", "Titol 2", "Editorial", 2021, 1, "Autor", "Tematica");
         lm.emmagatzemarLlibre(llibre2);
         lm.catalogarLlibre();
-        Llibre cat2 = lm.getLlibreByISBN("isbn-1234");
-        Assert.assertEquals(2, cat2.getQuantitat());
+        Assert.assertEquals(2, lm.getLlibreByISBN("isbn-1234").getQuantitat());
     }
 
     @Test(expected = NoHayLibrosException.class)
     public void testCatalogarSenseLlibres() {
-        // Verificamos que si no hay libros para catalogar, se lanza la excepción correcta
         Assert.assertEquals(0, lm.sizeCatalogats());
         lm.catalogarLlibre();
     }
 
     @Test
     public void testPrestarLlibreExitós() {
-        // preparar lector i llibre catalogat
         Lector lector = new Lector("lector1", "Pablo", "Casado", "63482641G", "12/08/2005", "Barcelona", "C/Viladomat 112");
         lm.afegirLector(lector);
 
         Llibre llibre = new Llibre("llibre1", "isbn-5678", "Titol", "Editorial", 2019, 1, "Autor", "Tematica");
         lm.emmagatzemarLlibre(llibre);
-        lm.catalogarLlibre(); // now quantitat = 1
+        lm.catalogarLlibre();
 
         Prestec prestec = new Prestec("prestec1", "lector1", "isbn-5678", "01/01/2025", "15/01/2025");
         lm.prestarLlibre(prestec);
 
         Assert.assertEquals(1, lm.sizePrestecs());
-        Llibre cat = lm.getLlibreByISBN("isbn-5678");
-        Assert.assertEquals(0, cat.getQuantitat());
+        Assert.assertEquals(0, lm.getLlibreByISBN("isbn-5678").getQuantitat());
         Assert.assertEquals("En tràmit", prestec.getEstat());
     }
 
@@ -112,14 +102,12 @@ public class LlibreManagerTest {
         lm.afegirLector(lector);
 
         Llibre llibre = new Llibre("llibre1", "isbn-0", "Titol", "Editorial", 2017, 1, "Autor", "Tematica");
-        // catalogamos una vez y luego prestamos para dejar a 0
         lm.emmagatzemarLlibre(llibre);
         lm.catalogarLlibre();
 
         Prestec p1 = new Prestec("p1", "lector1", "isbn-0", "01/01/2025", "15/01/2025");
         lm.prestarLlibre(p1);
 
-        // ahora intentar prestar de nuevo debe lanzar SinEjemplaresException
         Prestec p2 = new Prestec("p2", "lector1", "isbn-0", "02/01/2025", "16/01/2025");
         lm.prestarLlibre(p2);
     }
