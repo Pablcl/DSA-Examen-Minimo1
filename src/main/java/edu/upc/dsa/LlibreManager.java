@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface LlibreManager {
 
-    public void afegirLector(String id, String nom, String cognoms, String dni, String datanaixement, String llocnaixement, String adreça);
+    public void afegirLector(Lector lector);
     public void emmagatzemarLlibre(Llibre llibre);
     public void catalogarLlibre();
     public void prestarLlibre(Prestec prestec);

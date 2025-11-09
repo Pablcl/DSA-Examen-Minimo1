@@ -10,8 +10,6 @@ public class Lector {
     private String llocnaixement;
     private String adreça;
 
-    public Lector() {} // Constructor vacío
-
     public Lector(String id, String nom, String cognoms, String dni, String datanaixement, String llocnaixement, String adreça) {
         this.id = id;
         this.nom = nom;
@@ -21,6 +19,7 @@ public class Lector {
         this.llocnaixement = llocnaixement;
         this.adreça = adreça;
     }
+    public Lector(){}
 
     public String getId() {
         return id;

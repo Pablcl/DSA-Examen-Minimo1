@@ -12,8 +12,6 @@ public class Llibre {
     private String tematica;
     private int quantitat;
 
-    public Llibre() {} // Constructor vacío
-
     public Llibre(String id, String ISBN, String titol, String editorial, int any, int numedicio, String autor, String tematica) {
         this.id = id;
         this.ISBN = ISBN;
@@ -25,6 +23,8 @@ public class Llibre {
         this.tematica = tematica;
         this.quantitat = 0;
     }
+
+    public Llibre(){}
 
     public String getId() {
         return id;

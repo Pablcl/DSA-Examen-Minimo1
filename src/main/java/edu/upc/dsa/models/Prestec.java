@@ -7,9 +7,7 @@ public class Prestec {
     private String idLlibre;
     private String dataPrestec;
     private String dataFinalDevolucio;
-    private String estat; // Estado (si está en trámite o si no), no es mala la de que sea una variable tipo boolean (estat false/true)
-
-    public Prestec() {}
+    private String estat; 
 
     public Prestec(String id, String idLector, String idLlibre, String dataPrestec, String dataFinalDevolucio) {
         this.id = id;
@@ -17,8 +15,10 @@ public class Prestec {
         this.idLlibre = idLlibre;
         this.dataPrestec = dataPrestec;
         this.dataFinalDevolucio = dataFinalDevolucio;
-        this.estat = "Nada por el momento"; // Estado por defecto
+//        this.estat = "Nada por el momento";
     }
+
+    public Prestec(){}
 
     public String getId() {
         return id;

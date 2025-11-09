@@ -4,6 +4,7 @@ import edu.upc.dsa.models.*;
 import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.List;
 import java.util.Stack;
 
@@ -12,7 +13,7 @@ public class LlibreManagerImpl implements LlibreManager {
     private static LlibreManagerImpl instance;
     final static Logger logger = Logger.getLogger(LlibreManagerImpl.class);
 
-    private List<Stack<Llibre>> llistamunts; // Lista de pilas de libros
+    private Queue<Stack<Llibre>> llistamunts; 
     private List<Llibre> catalogats;
     private List<Lector> lectors;
     private List<Prestec> prestecs;
@@ -33,30 +34,29 @@ public class LlibreManagerImpl implements LlibreManager {
     }
 
     @Override
-    public void afegirLector(String id, String nom, String cognoms, String dni, String datanaixement, String llocnaixement, String adreça){
-        logger.info("afegirLector(id: " + id + ", nom: " + nom + ", cognoms: " + cognoms + ")");
+    public void afegirLector(Lector lector){
+        logger.info("afegirLector(id: " + lector.getId() + ", nom: " + lector.getNom() + ")");
         for (Lector l : lectors){
-            if (l.getId().equals(id)){
-                l.setId(id);
-                l.setNom(nom);
-                l.setCognoms(cognoms);
-                l.setDni(dni);
-                l.setDatanaixement(datanaixement);
-                l.setLlocnaixement(llocnaixement);
-                l.setAdreça(adreça);
-                logger.info("Lector con id '" + id + "' actualizado.");
+            if (l.getId().equals(lector.getId())){
+                l.setNom(lector.getNom());
+                l.setCognoms(lector.getCognoms());
+                l.setDni(lector.getDni());
+                l.setDatanaixement(lector.getDatanaixement());
+                l.setLlocnaixement(lector.getLlocnaixement());
+                l.setAdreça(lector.getAdreça());
+                logger.info("Lector con id '" + lector.getId() + "' actualizado.");
                 return;
             }
         }
-        Lector lector = new Lector(id, nom, cognoms, dni, datanaixement, llocnaixement, adreça);
-        lectors.add(lector);
-        logger.info("Nuevo lector añadido: " + lector.getNom() + ". Total lectores: " + lectors.size());
+        Lector nouLector = new Lector(lector.getId(), lector.getNom(), lector.getCognoms(), lector.getDni(), lector.getDatanaixement(), lector.getLlocnaixement(), lector.getAdreça());
+        lectors.add(nouLector);
+        logger.info("Nuevo lector añadido: " + nouLector.getNom() + ". Total lectores: " + lectors.size());
     }
 
     @Override
     public void emmagatzemarLlibre(Llibre llibre){
         logger.info("emmagatzemarLlibre(llibre: " + llibre.getTitol() + ")");
-        Stack<Llibre> munt = llistamunts.get(llistamunts.size()-1); // ultimo munt
+        Stack<Llibre> munt = ((LinkedList<Stack<Llibre>>) llistamunts).getLast();
 
         if(munt.size() >= 10){
             munt = new Stack<>();
@@ -69,27 +69,28 @@ public class LlibreManagerImpl implements LlibreManager {
     }
 
     @Override
-    public void catalogarLlibre(){ // Cambiado a void
+    public void catalogarLlibre(){
         logger.info("catalogarLlibre() - Inicio");
-        Stack<Llibre> munt = llistamunts.get(0); //primer munt
+        Stack<Llibre> munt = llistamunts.peek();
 
         if (munt.isEmpty()) {
-            logger.warn("No hay libros en el primer munt para catalogar. Operación de catalogación omitida.");
-            return; // Salida temprana, no se devuelve código de estado
+            llistamunts.poll();
+            logger.warn("El primer munt estaba vacío. Intentando con el siguiente.");
+            catalogarLlibre();
+            return;
         }
+
         Llibre llibre = munt.pop();
 
         if (munt.isEmpty()){
-            if(llistamunts.size() > 1){
-                llistamunts.remove(0);
-            }
+            llistamunts.poll();
         }
         for (Llibre l : catalogats){
             if (l.getISBN().equals(llibre.getISBN())){
                 l.setQuantitat(l.getQuantitat() + 1);
                 logger.info("ISBN '" + llibre.getISBN() + "' ya catalogado. Se ha incrementado el nombre d'exemplars a " + l.getQuantitat());
                 logger.info("catalogarLlibre() - Fin");
-                return; // Salida temprana
+                return; 
             }
         }
         llibre.setQuantitat(1);
@@ -102,7 +103,7 @@ public class LlibreManagerImpl implements LlibreManager {
     public void prestarLlibre(Prestec prestec){
         logger.info("prestarLlibre(prestecID: " + prestec.getId() + ", llibreID: " + prestec.getIdLlibre() + ", lectorID: " + prestec.getIdLector() + ")");
         for (Llibre l : catalogats){
-            if(l.getId().equals(prestec.getIdLlibre())){
+            if(l.getISBN().equals(prestec.getIdLlibre())){
                 if (l.getQuantitat() <= 0) {
                     logger.error("Error en prestarLlibre: No existen ejemplares suficientes del libro con ID '" + l.getId() + "'.");
                     return;
@@ -117,7 +118,7 @@ public class LlibreManagerImpl implements LlibreManager {
                     }
                 }
                 logger.error("Error en prestarLlibre: Lector con ID '" + prestec.getIdLector() + "' no encontrado.");
-                return; // Lector no encontrado
+                return; 
             }
         }
         logger.error("Error en prestarLlibre: Libro con ID '" + prestec.getIdLlibre() + "' no encontrado en el catálogo.");
