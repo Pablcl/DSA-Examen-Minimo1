@@ -13,7 +13,7 @@ public class LlibreManagerImpl implements LlibreManager {
     private static LlibreManagerImpl instance;
     final static Logger logger = Logger.getLogger(LlibreManagerImpl.class);
 
-    private Queue<Stack<Llibre>> llistamunts; 
+    private Queue<Stack<Llibre>> llistamunts;
     private List<Llibre> catalogats;
     private List<Lector> lectors;
     private List<Prestec> prestecs;
@@ -22,8 +22,8 @@ public class LlibreManagerImpl implements LlibreManager {
         llistamunts = new LinkedList<>();
         llistamunts.add(new Stack<>());
         catalogats = new ArrayList<>();
-        lectors = new ArrayList<Lector>();
-        prestecs = new ArrayList<Prestec>();
+        lectors = new ArrayList<>();
+        prestecs = new ArrayList<>();
     }
 
     public static LlibreManagerImpl getInstance() {
@@ -35,7 +35,7 @@ public class LlibreManagerImpl implements LlibreManager {
 
     @Override
     public void afegirLector(Lector lector){
-        logger.info("afegirLector(id: " + lector.getId() + ", nom: " + lector.getNom() + ")");
+        logger.info("Iniciando la adición o actualización del lector con ID '" + lector.getId() + "'.");
         for (Lector l : lectors){
             if (l.getId().equals(lector.getId())){
                 l.setNom(lector.getNom());
@@ -44,98 +44,118 @@ public class LlibreManagerImpl implements LlibreManager {
                 l.setDatanaixement(lector.getDatanaixement());
                 l.setLlocnaixement(lector.getLlocnaixement());
                 l.setAdreça(lector.getAdreça());
-                logger.info("Lector con id '" + lector.getId() + "' actualizado.");
+                logger.info("Se han actualizado los datos del lector con ID '" + lector.getId() + "'.");
                 return;
             }
         }
-        Lector nouLector = new Lector(lector.getId(), lector.getNom(), lector.getCognoms(), lector.getDni(), lector.getDatanaixement(), lector.getLlocnaixement(), lector.getAdreça());
+        Lector nouLector = new Lector(
+                lector.getId(), lector.getNom(), lector.getCognoms(),
+                lector.getDni(), lector.getDatanaixement(),
+                lector.getLlocnaixement(), lector.getAdreça()
+        );
         lectors.add(nouLector);
-        logger.info("Nuevo lector añadido: " + nouLector.getNom() + ". Total lectores: " + lectors.size());
+        logger.info("Se ha añadido un nuevo lector: " + nouLector.getNom() + ". El total de lectores ahora es " + lectors.size() + ".");
     }
 
     @Override
     public void emmagatzemarLlibre(Llibre llibre){
-        logger.info("emmagatzemarLlibre(llibre: " + llibre.getTitol() + ")");
+        logger.info("Iniciando el almacenamiento del libro: '" + llibre.getTitol() + "'.");
         Stack<Llibre> munt = ((LinkedList<Stack<Llibre>>) llistamunts).getLast();
 
         if(munt.size() >= 10){
             munt = new Stack<>();
             llistamunts.add(munt);
-            logger.info("Se ha creado un nuevo munt. Total munts: " + llistamunts.size());
-
+            logger.info("Se ha creado una nueva pila de libros. El total de pilas es " + llistamunts.size() + ".");
         }
         munt.push(llibre);
-        logger.info("Libro '" + llibre.getTitol() + "' emmagatzemat. Tamaño del munt actual: " + munt.size());
+        logger.info("El libro '" + llibre.getTitol() + "' ha sido almacenado. La pila actual contiene " + munt.size() + " libros.");
     }
 
     @Override
     public void catalogarLlibre(){
-        logger.info("catalogarLlibre() - Inicio");
-        Stack<Llibre> munt = llistamunts.peek();
+        logger.info("Iniciando el proceso de catalogación de un libro.");
 
-        if (munt.isEmpty()) {
+
+        while (!llistamunts.isEmpty() && llistamunts.peek().isEmpty()) {
             llistamunts.poll();
-            logger.warn("El primer munt estaba vacío. Intentando con el siguiente.");
-            catalogarLlibre();
+        }
+        if (llistamunts.isEmpty()) {
+            logger.warn("No se han encontrado libros pendientes para catalogar.");
             return;
         }
 
+        Stack<Llibre> munt = llistamunts.peek();
         Llibre llibre = munt.pop();
 
         if (munt.isEmpty()){
             llistamunts.poll();
         }
+
         for (Llibre l : catalogats){
             if (l.getISBN().equals(llibre.getISBN())){
                 l.setQuantitat(l.getQuantitat() + 1);
-                logger.info("ISBN '" + llibre.getISBN() + "' ya catalogado. Se ha incrementado el nombre d'exemplars a " + l.getQuantitat());
-                logger.info("catalogarLlibre() - Fin");
-                return; 
+                logger.info("El libro con ISBN '" + llibre.getISBN() + "' ya estaba catalogado. Se ha incrementado el número de ejemplares a " + l.getQuantitat() + ".");
+                return;
             }
         }
+
         llibre.setQuantitat(1);
         catalogats.add(llibre);
-        logger.info("Nuevo libro catalogado: '" + llibre.getTitol() + "'. Total libros catalogados: " + catalogats.size());
-        logger.info("catalogarLlibre() - Fin");
+        logger.info("Se ha catalogado un nuevo libro: '" + llibre.getTitol() + "'. El total de libros en el catálogo es " + catalogats.size() + ".");
     }
 
     @Override
     public void prestarLlibre(Prestec prestec){
-        logger.info("prestarLlibre(prestecID: " + prestec.getId() + ", llibreID: " + prestec.getIdLlibre() + ", lectorID: " + prestec.getIdLector() + ")");
+        logger.info("Iniciando el proceso de préstamo para el lector '" + prestec.getIdLector() + "' y el libro con ISBN '" + prestec.getIsbnLlibre() + "'.");
+
+
+        Llibre llibreTrobat = null;
         for (Llibre l : catalogats){
-            if(l.getISBN().equals(prestec.getIdLlibre())){
-                if (l.getQuantitat() <= 0) {
-                    logger.error("Error en prestarLlibre: No existen ejemplares suficientes del libro con ID '" + l.getId() + "'.");
-                    return;
-                }
-                for (Lector lector : lectors){
-                    if (lector.getId().equals(prestec.getIdLector())){
-                        prestec.setEstat("En tràmit");
-                        l.setQuantitat(l.getQuantitat()-1);
-                        prestecs.add(prestec);
-                        logger.info("Préstamo '" + prestec.getId() + "' realizado con éxito. Libro: '" + l.getTitol() + "', Lector: '" + lector.getNom() + "'. Ejemplares restantes: " + l.getQuantitat());
-                        return;
-                    }
-                }
-                logger.error("Error en prestarLlibre: Lector con ID '" + prestec.getIdLector() + "' no encontrado.");
-                return; 
+            if(l.getISBN().equals(prestec.getIsbnLlibre())){
+                llibreTrobat = l;
+                break;
             }
         }
-        logger.error("Error en prestarLlibre: Libro con ID '" + prestec.getIdLlibre() + "' no encontrado en el catálogo.");
+        if (llibreTrobat == null) {
+            logger.error("No se ha podido realizar el préstamo porque el libro con ISBN '" + prestec.getIsbnLlibre() + "' no se ha encontrado en el catálogo.");
+            return;
+        }
+
+        Lector lectorTrobat = null;
+        for (Lector lector : lectors){
+            if (lector.getId().equals(prestec.getIdLector())){
+                lectorTrobat = lector;
+                break;
+            }
+        }
+        if (lectorTrobat == null) {
+            logger.error("No se ha podido realizar el préstamo porque el lector con ID '" + prestec.getIdLector() + "' no se ha encontrado.");
+            return;
+        }
+
+        if (llibreTrobat.getQuantitat() <= 0) {
+            logger.error("No se ha podido realizar el préstamo porque no quedan ejemplares disponibles del libro '" + llibreTrobat.getTitol() + "'.");
+            return;
+        }
+
+        prestec.setEstat("En tràmit");
+        llibreTrobat.setQuantitat(llibreTrobat.getQuantitat()-1);
+        prestecs.add(prestec);
+
+        logger.info("El préstamo con ID '" + prestec.getId() + "' se ha realizado con éxito. Libro: '" + llibreTrobat.getTitol() + "', Lector: '" + lectorTrobat.getNom() + "'. Quedan " + llibreTrobat.getQuantitat() + " ejemplares.");
     }
 
     @Override
     public List<Prestec> consultarPrestecs(Lector lector){
-        logger.info("consultarPrestecs(lectorID: " + lector.getId() + ") - Inicio");
+        logger.info("Iniciando la consulta de préstamos para el lector con ID '" + lector.getId() + "'.");
         List<Prestec> prestecsLector = new ArrayList<>();
         for(Prestec p: prestecs){
             if(p.getIdLector().equals(lector.getId())){
                 prestecsLector.add(p);
             }
         }
-        logger.info("consultarPrestecs - Fin. Se encontraron " + prestecsLector.size() + " préstamos para el lector '" + lector.getNom() + "'.");
+        logger.info("La consulta ha finalizado. Se han encontrado " + prestecsLector.size() + " préstamos para el lector '" + lector.getNom() + "'.");
         return prestecsLector;
-
     }
 
     public int sizeLectors() {
@@ -143,22 +163,38 @@ public class LlibreManagerImpl implements LlibreManager {
     }
 
     public int sizeCatalogats() {
-        return this.catalogats.size();
+        return catalogats.size();
     }
 
     public int sizePrestecs() {
-        return this.prestecs.size();
+        return prestecs.size();
     }
 
     public Llibre getLlibreCatalogat(String id) {
-        return this.catalogats.stream().filter(l -> l.getId().equals(id)).findFirst().orElse(null);
+        for (Llibre l : catalogats){
+            if (l.getId().equals(id)) return l;
+        }
+        return null;
     }
 
     public Llibre getLlibre(String id) {
-        return this.catalogats.stream().filter(l -> l.getId().equals(id)).findFirst().orElse(null);
+        for (Llibre l : catalogats){
+            if (l.getId().equals(id)) return l;
+        }
+        return null;
     }
 
     public Lector getLector(String id) {
-        return this.lectors.stream().filter(l -> l.getId().equals(id)).findFirst().orElse(null);
+        for (Lector l : lectors){
+            if (l.getId().equals(id)) return l;
+        }
+        return null;
+    }
+
+    public Llibre getLlibreByISBN(String isbn) {
+        for (Llibre l : catalogats){
+            if (l.getISBN().equals(isbn)) return l;
+        }
+        return null;
     }
 }

@@ -4,18 +4,17 @@ public class Prestec {
 
     private String id;
     private String idLector;
-    private String idLlibre;
+    private String isbnLlibre;
     private String dataPrestec;
     private String dataFinalDevolucio;
     private String estat; 
 
-    public Prestec(String id, String idLector, String idLlibre, String dataPrestec, String dataFinalDevolucio) {
+    public Prestec(String id, String idLector, String isbnLlibre, String dataPrestec, String dataFinalDevolucio) {
         this.id = id;
         this.idLector = idLector;
-        this.idLlibre = idLlibre;
+        this.isbnLlibre = isbnLlibre;
         this.dataPrestec = dataPrestec;
         this.dataFinalDevolucio = dataFinalDevolucio;
-//        this.estat = "Nada por el momento";
     }
 
     public Prestec(){}
@@ -36,12 +35,12 @@ public class Prestec {
         this.idLector = idLector;
     }
 
-    public String getIdLlibre() {
-        return idLlibre;
+    public String getIsbnLlibre() {
+        return isbnLlibre;
     }
 
-    public void setIdLlibre(String idLlibre) {
-        this.idLlibre = idLlibre;
+    public void setIsbnLlibre(String isbnLlibre) {
+        this.isbnLlibre = isbnLlibre;
     }
 
     public String getDataPrestec() {

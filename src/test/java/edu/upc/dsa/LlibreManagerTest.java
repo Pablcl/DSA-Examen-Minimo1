@@ -64,7 +64,7 @@ public class LlibreManagerTest {
         Assert.assertEquals(1, llibre.getQuantitat());
         Assert.assertEquals(0, lm.sizePrestecs());
 
-        Prestec prestec = new Prestec("prestec1", "lector1", "llibre2", "2023-11-21", "2023-12-21");
+        Prestec prestec = new Prestec("prestec1", "lector1", "978-84-9809-207-5", "2023-11-21", "2023-12-21");
         lm.prestarLlibre(prestec);
 
         Assert.assertEquals(0, llibre.getQuantitat());
@@ -76,8 +76,8 @@ public class LlibreManagerTest {
         lm.catalogarLlibre();
         lm.catalogarLlibre();
 
-        Prestec p1 = new Prestec("p1", "lector1", "llibre1", "2023-10-01", "2023-10-21");
-        Prestec p2 = new Prestec("p2", "lector1", "llibre2", "2023-11-01", "2023-11-21");
+        Prestec p1 = new Prestec("p1", "lector1", "978-84-08-06782-1", "2023-10-01", "2023-10-21");
+        Prestec p2 = new Prestec("p2", "lector1", "978-84-9809-207-5", "2023-11-01", "2023-11-21");
         lm.prestarLlibre(p1);
         lm.prestarLlibre(p2);
 

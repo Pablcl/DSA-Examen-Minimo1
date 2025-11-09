@@ -90,11 +90,11 @@ public class LlibreService {
     @Path("/prestecs")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response prestarLlibre(Prestec prestec) {
-        if (prestec == null || prestec.getIdLlibre() == null || prestec.getIdLector() == null) {
+        if (prestec == null || prestec.getIsbnLlibre() == null || prestec.getIdLector() == null) {
             return Response.status(400).entity("Falten dades del préstec").build();
         }
 
-        Llibre llibre = lm.getLlibre(prestec.getIdLlibre());
+        Llibre llibre = lm.getLlibreByISBN(prestec.getIsbnLlibre());
         if (llibre == null) {
             return Response.status(404).entity("Llibre no trobat").build();
         }
