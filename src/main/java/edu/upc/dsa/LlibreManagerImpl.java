@@ -1,6 +1,7 @@
 package edu.upc.dsa;
 
 import edu.upc.dsa.models.*;
+import edu.upc.dsa.exceptions.*;
 import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -60,6 +61,10 @@ public class LlibreManagerImpl implements LlibreManager {
     @Override
     public void emmagatzemarLlibre(Llibre llibre){
         logger.info("Iniciando el almacenamiento del libro: '" + llibre.getTitol() + "'.");
+        if (llistamunts.isEmpty()) {
+            llistamunts.add(new Stack<>());
+            logger.warn("La lista de pilas estaba vacía. Se ha creado una nueva pila.");
+        }
         Stack<Llibre> munt = ((LinkedList<Stack<Llibre>>) llistamunts).getLast();
 
         if(munt.size() >= 10){
@@ -81,7 +86,7 @@ public class LlibreManagerImpl implements LlibreManager {
         }
         if (llistamunts.isEmpty()) {
             logger.warn("No se han encontrado libros pendientes para catalogar.");
-            return;
+            throw new NoHayLibrosException("No se han encontrado libros pendientes para catalogar.");
         }
 
         Stack<Llibre> munt = llistamunts.peek();
@@ -118,7 +123,7 @@ public class LlibreManagerImpl implements LlibreManager {
         }
         if (llibreTrobat == null) {
             logger.error("No se ha podido realizar el préstamo porque el libro con ISBN '" + prestec.getIsbnLlibre() + "' no se ha encontrado en el catálogo.");
-            return;
+            throw new LibroNoEncontradoException("No se ha podido realizar el préstamo porque el libro con ISBN '" + prestec.getIsbnLlibre() + "' no se ha encontrado en el catálogo.");
         }
 
         Lector lectorTrobat = null;
@@ -130,12 +135,12 @@ public class LlibreManagerImpl implements LlibreManager {
         }
         if (lectorTrobat == null) {
             logger.error("No se ha podido realizar el préstamo porque el lector con ID '" + prestec.getIdLector() + "' no se ha encontrado.");
-            return;
+            throw new LectorNoEncontradoException("No se ha podido realizar el préstamo porque el lector con ID '" + prestec.getIdLector() + "' no se ha encontrado.");
         }
 
         if (llibreTrobat.getQuantitat() <= 0) {
             logger.error("No se ha podido realizar el préstamo porque no quedan ejemplares disponibles del libro '" + llibreTrobat.getTitol() + "'.");
-            return;
+            throw new SinEjemplaresException("No se ha podido realizar el préstamo porque no quedan ejemplares disponibles del libro '" + llibreTrobat.getTitol() + "'.");
         }
 
         prestec.setEstat("En tràmit");
@@ -196,5 +201,13 @@ public class LlibreManagerImpl implements LlibreManager {
             if (l.getISBN().equals(isbn)) return l;
         }
         return null;
+    }
+
+    public void reset() {
+        this.lectors.clear();
+        this.catalogats.clear();
+        this.prestecs.clear();
+        this.llistamunts.clear();
+        this.llistamunts.add(new Stack<>());
     }
 }

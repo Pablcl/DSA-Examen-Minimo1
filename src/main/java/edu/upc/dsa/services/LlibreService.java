@@ -3,12 +3,9 @@ package edu.upc.dsa.services;
 import edu.upc.dsa.LlibreManager;
 import edu.upc.dsa.LlibreManagerImpl;
 import edu.upc.dsa.models.Lector;
+import edu.upc.dsa.exceptions.*;
 import edu.upc.dsa.models.Llibre;
 import edu.upc.dsa.models.Prestec;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
@@ -16,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Api(value = "/biblioteca", description = "Servei Biblioteca")
 @Path("/biblioteca")
 public class LlibreService {
 
@@ -36,11 +32,6 @@ public class LlibreService {
     }
 
     @POST
-    @ApiOperation(value = "Afegir un nou lector", notes = "Afegeix un nou usuari lector al sistema")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful", response = Lector.class),
-            @ApiResponse(code = 400, message = "Bad Request (falten dades)")
-    })
     @Path("/lectores")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response afegirLector(Lector lector) {
@@ -52,11 +43,6 @@ public class LlibreService {
     }
 
     @POST
-    @ApiOperation(value = "Emmagatzemar un llibre", notes = "Afegeix un llibre a la pila d'emmagatzematge")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful"),
-            @ApiResponse(code = 400, message = "Bad Request (falten dades del llibre)")
-    })
     @Path("/almacen/libros")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response emmagatzemarLlibre(Llibre llibre) {
@@ -68,56 +54,34 @@ public class LlibreService {
     }
 
     @POST
-    @ApiOperation(value = "Catalogar un llibre", notes = "Cataloga un llibre de la pila d'emmagatzematge al catàleg principal")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Llibre ja catalogat, quantitat incrementada"),
-            @ApiResponse(code = 201, message = "Nou llibre catalogat"),
-            @ApiResponse(code = 404, message = "No hi ha llibres per catalogar")
-    })
     @Path("/catalogar")
     public Response catalogarLlibre() {
-        this.lm.catalogarLlibre();
-        return Response.status(201).entity("Operación de catalogación intentada. Puede que se haya catalogado un libro o se haya incrementado la cantidad.").build();
+        try {
+            this.lm.catalogarLlibre();
+            return Response.status(200).entity("Operació de catalogació realitzada.").build();
+        } catch (NoHayLibrosException e) {
+            return Response.status(404).entity(e.getMessage()).build();
+        }
     }
     
     @POST
-    @ApiOperation(value = "Realitzar un préstec", notes = "Presta un llibre a un lector")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful"),
-            @ApiResponse(code = 404, message = "Llibre o lector no trobat"),
-            @ApiResponse(code = 409, message = "No hi ha exemplars disponibles")
-    })
     @Path("/prestecs")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response prestarLlibre(Prestec prestec) {
         if (prestec == null || prestec.getIsbnLlibre() == null || prestec.getIdLector() == null) {
             return Response.status(400).entity("Falten dades del préstec").build();
         }
-
-        Llibre llibre = lm.getLlibreByISBN(prestec.getIsbnLlibre());
-        if (llibre == null) {
-            return Response.status(404).entity("Llibre no trobat").build();
+        try {
+            this.lm.prestarLlibre(prestec);
+            return Response.status(200).entity(prestec).build();
+        } catch (LibroNoEncontradoException | LectorNoEncontradoException e) {
+            return Response.status(404).entity(e.getMessage()).build();
+        } catch (SinEjemplaresException e) {
+            return Response.status(409).entity(e.getMessage()).build();
         }
-
-        if (lm.getLector(prestec.getIdLector()) == null) {
-            return Response.status(404).entity("Lector no trobat").build();
-        }
-
-        if (llibre.getQuantitat() <= 0) {
-            return Response.status(409).entity("No hi ha exemplars disponibles").build();
-        }
-
-        prestec.setEstat("En tràmit");
-        this.lm.prestarLlibre(prestec);
-        return Response.status(200).entity(prestec).build();
     }
     
     @GET
-    @ApiOperation(value = "Consultar préstecs d'un lector", notes = "Retorna la llista de préstecs d'un lector")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful", response = Prestec.class, responseContainer = "List"),
-            @ApiResponse(code = 404, message = "Lector no trobat")
-    })
     @Path("/lectores/{idLector}/prestecs")
     @Produces(MediaType.APPLICATION_JSON)
     public Response consultarPrestecs(@PathParam("idLector") String idLector) {
