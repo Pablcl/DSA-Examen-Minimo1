@@ -16,3 +16,6 @@ Examen del Minimo 1 de la asignatura de DSA que consiste en un proyecto de Gesti
 He buscado info por internet, para añadir una funcionalidad que haga que swagger no pida el estado del prestamo al usuario (lo oculte) ya que no tiene sentido que se le pregunte, y una vez el usuario añada el prestamo si que se actualize a "en tramite" pero finalmente he decidido no añadirla.
 
 -Se han añadido excepciones tipo not found para mejorar el control de errores.
+
+
+ATENCIÓN: He vuelto a probar swagger (miercoles día 12) porque quería ver una cosa para el proyecto y parece que el LlibreService no se debió guardar al hacer el commit con las modificaciones de la implementación y no dejaba abrir swagger. Aunque sé que estoy fuera de tiempo hago commit colgando el LlibreService correctamente guardado para abrir Swagger correctamente. Sino, la versión al finalizar el examen sí que funcionaba Swagger aunque hubieran ciertas cosas de la implementación que mejorar. 
