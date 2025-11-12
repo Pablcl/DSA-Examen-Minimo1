@@ -13,4 +13,5 @@ public interface LlibreManager {
     public void prestarLlibre(Prestec prestec);
     public List<Prestec> consultarPrestecs(Lector lector);
     public Llibre getLlibreByISBN(String isbn);
+    public int sizeLectors();
 }
